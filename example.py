@@ -23,7 +23,7 @@ ov7670 = OV7670Wrapper(
     shutdown_pin_no=shutdown_pin_no,
 )
 
-ov7670.wrapper_configure_rgb()
+ov7670.wrapper_configure_yuv()
 ov7670.wrapper_configure_base()
 width,height = ov7670.wrapper_configure_size(OV7670_WRAPPER_SIZE_DIV8)
 ov7670.wrapper_configure_test_pattern(OV7670_WRAPPER_TEST_PATTERN_NONE)
@@ -34,10 +34,6 @@ ov7670.capture(buf)
 chars = " .:-=+*#%@"
 for y in range(height):
     for x in range(width):
-        rgb565 = (buf[2*(y*width+x)] << 8) | buf[2*(y*width+x)+1]
-        r = ((rgb565 >> 11) & 0x1F) << 3
-        g = ((rgb565 >>  5) & 0x3F) << 2
-        b = ((rgb565 >>  0) & 0x1F) << 3
-        v = max(r, g, b)
-        print(chars[v*len(chars)//256], end='')
+        value = buf[2*(y*width+x)]
+        print(chars[value*len(chars)//256], end='')
     print('')

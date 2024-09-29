@@ -110,6 +110,9 @@ class OV7670Wrapper(OV7670):
         self.write_register(OV7670_REG_COM7  , 0x04)
         self.write_register(OV7670_REG_RGB444, 0x00)
         self.write_register(OV7670_REG_COM15 , 0x10 | 0xC0)
+    def wrapper_configure_yuv(self):
+        self.write_register(OV7670_REG_COM7, 0x00)
+        self.write_register(OV7670_REG_COM15, 0xC0)
 
     def wrapper_configure_size(self, size):
         com3,com14,dcw,pclk_div,scaling_bits,vstart,hstart,edge_offset = [
