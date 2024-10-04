@@ -145,6 +145,9 @@ class OV7670:
         self.mclk_pin = machine.Pin(mclk_pin_no)
         self.reset_pin = machine.Pin(reset_pin_no, machine.Pin.OUT)
         self.shutdown_pin = machine.Pin(shutdown_pin_no, machine.Pin.OUT) if shutdown_pin_no else None
+        machine.Pin(vsync_pin_no, machine.Pin.IN)
+        machine.Pin(href_pin_no, machine.Pin.IN)
+        machine.Pin(pclk_pin_no, machine.Pin.IN)
         for i in range(8):
             machine.Pin(data_pin_base + i, machine.Pin.IN)
         self.i2c_id = i2c_id
