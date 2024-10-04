@@ -139,6 +139,7 @@ class OV7670:
         shutdown_pin_no: Optional[int] = None,
         i2c_id: int = 0x21,
         mclk_frequency: int = 16000000,
+        half_capture=False,
     ):
         self.i2c = i2c_bus
         self.mclk_pin = machine.Pin(mclk_pin_no)
@@ -175,6 +176,11 @@ class OV7670:
             wait(1, gpio, pclk_pin_no)
             in_(pins, 8)
             wait(0, gpio, pclk_pin_no)
+            if half_capture:
+                # Capture only first byte of each word (value byte in YUV).
+                wait(1, gpio, href_pin_no)
+                wait(1, gpio, pclk_pin_no)
+                wait(0, gpio, pclk_pin_no)
             wrap()
         self.sm = rp2.StateMachine(0, pio_capture, in_base=machine.Pin(data_pin_base))
         self.dma = rp2.DMA()
