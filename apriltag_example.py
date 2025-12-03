@@ -1,5 +1,8 @@
+import gc
 import machine
+import apriltag
 from ov7670_wrapper import *
+import time
 
 data_pin_base   = 0 # 0 and the next 7 pins. So GPIO 0-7 in this case.
 pclk_pin_no     = 8
@@ -29,11 +32,31 @@ ov7670.wrapper_configure_base()
 width,height = ov7670.wrapper_configure_size(OV7670_WRAPPER_SIZE_DIV4)
 ov7670.wrapper_configure_test_pattern(OV7670_WRAPPER_TEST_PATTERN_NONE)
 
-buf = bytearray(width*height)
-print('capture start')
-ov7670.capture(buf)
-print('capture end')
-print(buf)
+img = bytearray(width*height)
+
+import select
+import sys
+
+def send_img(img):
+    # 12 chunks of 1600 bytes for 120x160 img
+    for chunk in range(0, len(img), 1600):
+        sys.stdout.write(img[chunk:chunk+1600])
+        time.sleep(0.05)
+        ack = sys.stdin.read(1)
+
+gc.collect()
+#print(f"{gc.mem_alloc()}/{gc.mem_alloc()+gc.mem_free()}")
+while True:
+    ov7670.capture(img)
+    # print(img)
+    #sys.stdout.buffer.write(img)
+    try:
+        detections = apriltag.detect(img)
+    except MemoryError:
+        detections = [(0, 0)]
+    print(str(detections))
+    send_img(img)
+    #poll_obj.poll(1000)
 
 #chars = " .:-=+*#%@"
 #for y in range(height):
@@ -41,3 +64,4 @@ print(buf)
 #        value = buf[2*(y*width+x)]
 #        print(chars[value*len(chars)//256], end='')
 #    print('')
+
